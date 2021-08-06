@@ -5,3 +5,6 @@ sudo yum install java-11-openjdk-devel -y
 sudo yum install git -y
 sudo  yum groupinstall "Server with GUI" -y 
 sudo ln -sf /lib/systemd/system/runlevel5.target /etc/systemd/system/default.target
+#For ansible in RHEL 7 and also installs python
+sudo subscription-manager repos --enable rhel-7-server-ansible-2.6-rpms
+sudo yum install ansible -y 
