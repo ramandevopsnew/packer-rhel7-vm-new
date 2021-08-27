@@ -1,0 +1,57 @@
+{
+	"builders": [{
+		"type": "virtualbox-iso",
+		"guest_os_type": "RedHat_64",
+		"vm_name": "rhel-7.6-vbox",
+		"disk_size": "50288",
+		"vboxmanage": [
+			["modifyvm", "{{.Name}}", "--memory", "2028"],
+			["modifyvm", "{{.Name}}", "--cpus", "4"],
+			["modifyvm", "{{.Name}}", "--ioapic", "on"],
+			["modifyvm", "{{.Name}}", "--pae", "on"],
+			["modifyvm", "{{.Name}}", "--rtcuseutc", "on"],
+			["modifyvm", "{{.Name}}", "--bioslogodisplaytime", "1"]
+		],
+		
+		"iso_url": "./iso/rhel-server-7.6-x86_64-dvd.iso",
+		"iso_checksum": "sha256:60a0be5aeed1f08f2bb7599a578c89ec134b4016cd62a8604b29f15d543a469c",
+		"http_directory": "http",
+		"ssh_wait_timeout": "20m",
+		"ssh_username": "vagrant",
+		"ssh_password": "vagrant",
+		"shutdown_command": "echo 'vagrant'|sudo -S /sbin/halt -h -p",
+		"boot_wait": "5s",
+		"boot_command": [
+			"<esc><wait>",
+			"vmlinuz initrd=initrd.img net.ifnames=0 biosdevname=0 ",
+			"ks=http://{{.HTTPIP}}:{{.HTTPPort}}/vbox-ks.cfg",
+			"<enter>"
+		]
+	}],
+
+    "provisioners": [{
+		"type": "shell",
+		"execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+		"scripts": [
+			"scripts/softwaresrhel.sh",
+			"scripts/sshd.sh",
+			"scripts/virtualbox.sh",
+			"scripts/cleanup.sh"
+		]
+	}],
+	"post-processors":[ {
+		"type": "vagrant",
+		"output": "rhel-7.6-vbox.box",
+		"keep_input_artifact": true
+	},
+	
+      {
+      "type":"artifactory",
+      "url": "http://localhost:8080/artifactory",
+      "repo": "vagrant-local",
+      "key": "AP44bXkZtZc7e7ZcGvs7LcswQoA"
+
+    }
+  ]
+	
+}
